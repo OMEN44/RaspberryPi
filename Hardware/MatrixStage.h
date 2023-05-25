@@ -13,7 +13,7 @@ class MatrixStage {
     void newStage();
     void setStage(std::vector<std::vector<int>> stage);
     void setStage(std::vector<std::vector<int>> stage, int rowCount, int colCount);
-    inline std::vector<std::vector<int>> getStage();
+    std::vector<std::vector<int>> getStage();
     
     //working with individual pixels
     int getValue(int x, int y);
