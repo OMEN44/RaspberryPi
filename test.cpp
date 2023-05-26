@@ -11,7 +11,7 @@ g++ -Wall -o test test.cpp Hardware/MatrixStage.cpp Hardware/Matrix.cpp Hardware
 */
 
 
-int frame1[16][16] = {
+vector<vector<int>> frame = {
     {1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
     {1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,0},
     {1,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0},
@@ -36,18 +36,30 @@ int main()
 
 	cout << "Starting testing" << endl << endl;
 
-	vector<vector<int>> vec(12, vector<int>(6, 1));
+	vector<vector<int>> vec(24, vector<int>(6, 1));
 
-	MatrixStage mstage(vec, 8, 4);
+	MatrixStage mstage(frame, 16, 16);
+    mstage.setCameraSize(4, 4);
 
-    cout << "printing with inbuilt" << endl;
-	mstage.print();
-
-    cout << "new stage:" << endl;
-    mstage.newStage();
     mstage.print();
 
-    vector<vector<int>> stageCopy = mstage.getStage();
+    if (!mstage.shift(2, 1))
+        cout << "Failed to shift" << endl;
+    cout << endl;
+    mstage.print();
+
+    int d = 1;
+    while (true) {
+        while (mstage.shift(d)) {
+            system("clear");
+            mstage.print();
+            cout << endl;
+            mstage.printCameraView();
+            sleep(1);
+        }
+        if (d == 1) d = 3;
+        else d = 1;
+    }
 
 
 	cout << endl << "Finished testing" << endl;
