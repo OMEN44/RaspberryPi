@@ -28,8 +28,8 @@ class Matrix {
     int C;
     int D;
 
-
     void update();
+    void update(int delay);
     void selectRow(int row);
     void decimalToBinary(int decimal, int* output);
 };

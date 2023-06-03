@@ -1,7 +1,8 @@
 #include <iostream>
 #include <pigpio.h>
 #include "Matrix.h"
-#include "MCP3008.h"
+#include "Hardware/MCP3008.h"
+#include "Hardware/Joystick.h"
 
 using namespace std;
 
@@ -50,9 +51,19 @@ int main() {
     gpioSetMode(D, PI_OUTPUT);
 
     matrix m;
+    Joystick j(3, 2, 26);
 
     while (true) {
-        m.update(frame1, 10000);
+        cout << "(" << j.getX() << ", " << j.getY() << ")";
+        int delay = 0;
+        if (j.getY() > 0) {
+            delay = j.getX() / 2 * 1000;
+        } else {
+            delay = 100;
+        }
+        cout << " delay: " << delay << endl;
+        m.update(frame1, j.getY() * 1000);
+        system("clear");
     }
 
     while (false) {

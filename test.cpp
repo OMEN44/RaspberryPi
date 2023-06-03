@@ -3,6 +3,8 @@
 #include <pigpio.h>
 #include "Hardware/MatrixStage.h"
 #include "Hardware/Matrix.h"
+#include "Hardware/MCP3008.h"
+#include "Hardware/Joystick.h"
 #include <vector>
 
 using namespace std;
@@ -48,9 +50,14 @@ int main()
     
     Matrix m(mstage, 18, 17, 16, 13, 12, 6, 5, 4);
 
+    Joystick j(3, 2, 26);
+
     while (true) {
+        if (j.getY() > 75)
+            m.getStage().shift(1);
+        else if (j.getY() < 25)
+            m.getStage().shift(3);
         m.update();
-        sleep(0.00000000001);
     }
 
     // bool running = true;

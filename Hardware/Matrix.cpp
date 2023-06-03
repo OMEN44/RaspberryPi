@@ -50,6 +50,10 @@ void Matrix::run(bool* running) {
 
 // private functions
 void Matrix::update() {
+    update(200);
+}
+
+void Matrix::update(int delay) {
     if (!this->stageInitialised) {
         std::cerr << "Stage not initialised" << std::endl;
         return;
@@ -67,6 +71,7 @@ void Matrix::update() {
         gpioWrite(LAT, 1);
         gpioWrite(LAT, 0);
         gpioWrite(G, 0);
+        gpioDelay(delay);
     }
 }
 
