@@ -11,7 +11,7 @@
 #define C 5
 #define D 4
 
-void matrix::update(int matrix[16][16]) {
+void matrix::update(int matrix[16][16], int delay) {
     for (int y = 0; y < 16; y++) {
         gpioWrite(G, 1);
         selectRow(y);
@@ -24,6 +24,7 @@ void matrix::update(int matrix[16][16]) {
         gpioWrite(LAT, 1);
         gpioWrite(LAT, 0);
         gpioWrite(G, 0);
+        gpioDelay(delay);
     }
 }
 
