@@ -9,18 +9,18 @@ MatrixStage::MatrixStage(vector<vector<int>> stage)
     : stage(stage) {}
 
 MatrixStage::MatrixStage(int width, int height) 
-    : stage(vector<vector<int>>(height, vector<int>(width, 0))) {}
+    : stage(vector<vector<int>>(height, vector<int>(width, 1))) {}
 
 MatrixStage::MatrixStage(vector<vector<int>> stage, int width, int height) {
-    this->stage = vector<vector<int>>(height, vector<int>(width, 0));
+    this->stage = vector<vector<int>>(height, vector<int>(width, 1));
     for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
-        if (y < stage.size() && x < stage[0].size())
+        if ((unsigned)y < stage.size() && (unsigned)x < stage[0].size())
             this->stage[y][x] = stage[y][x];
 }
 
 //Setting up and editing the stage
 void MatrixStage::newStage(int width, int height) {
-    this->stage = vector<vector<int>>(height, vector<int>(width, 0));
+    this->stage = vector<vector<int>>(height, vector<int>(width, 1));
 }
 
 void MatrixStage::newStage() {
@@ -32,9 +32,9 @@ void MatrixStage::setStage(vector<vector<int>> stage) {
 }
 
 void MatrixStage::setStage(vector<vector<int>> stage, int width, int height) {
-    this->stage = vector<vector<int>>(height, vector<int>(width, 0));
+    this->stage = vector<vector<int>>(height, vector<int>(width, 1));
     for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
-        if (y < stage.size() && x < stage[0].size())
+        if ((unsigned)y < stage.size() && (unsigned)x < stage[0].size())
             this->stage[y][x] = stage[y][x];
 }
 
@@ -121,7 +121,7 @@ bool MatrixStage::shift(int direction) {
 }
 
 vector<vector<int>> MatrixStage::getCameraView() {
-    vector<vector<int>> view(cameraHeight, vector<int>(cameraWidth, 0));
+    vector<vector<int>> view(cameraHeight, vector<int>(cameraWidth, 1));
     for (int y = 0; y < cameraHeight; y++) for (int x = 0; x < cameraWidth; x++)
         view[y][x] = stage[y + viewY][x + viewX];
     return view;
