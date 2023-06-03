@@ -46,23 +46,47 @@ int main()
 
 	vector<vector<int>> vec(24, vector<int>(6, 1));
 
-	MatrixStage mstage(frame, 32, 16);
+	MatrixStage mstage(16, 16);
+    mstage.setPixelValue(0, 0, 0);
+    int coords[2] = {0, 0};
     
     Matrix m(mstage, 18, 17, 16, 13, 12, 6, 5, 4);
 
-    Joystick j(3, 2, 26);
+    int inputBuffer = 0;
 
     while (true) {
-        if (j.getY() > 75)
-            m.getStage().shift(1);
-        else if (j.getY() < 25)
-            m.getStage().shift(3);
+        if (inputBuffer == 10) {
+            cout << "(" << coords[1] << ", " << coords[0] << ")" << endl;
+            m.getStage().setPixelValue(coords[1], coords[0], 1);
+            if (coords[0] == 15 && coords[1] == 15) {
+                coords[0] = 0;
+                coords[1] = 0;
+            } else if (coords[0] == 15) {
+                coords[0] = 0;
+                coords[1]++;
+            } else {
+                coords[0]++;
+            }
+            m.getStage().setPixelValue(coords[1], coords[0], 0);
+            inputBuffer = 0;
+        } else inputBuffer++;
         m.update();
     }
 
-    // bool running = true;
-    // m.run(&running);
-
+    // for (int y = 0; y < 16; y++) {
+    //     for (int x = 0; x < 16; x++) {
+    //         mstage.setPixelValue(coords[0], coords[1], 1);
+    //         if (coords[0] == 15) {
+    //             coords[0] = 0;
+    //             coords[1]++;
+    //         } else {
+    //             coords[0]++;
+    //         }
+    //         gpioDelay(100000);
+    //         m.update();
+    //     }
+    // }
+    gpioTerminate();
 
 	cout << endl << "Finished testing" << endl;
 

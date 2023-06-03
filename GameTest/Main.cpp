@@ -28,10 +28,10 @@ int main(int argc, char const *argv[])
     Joystick p0(2, 3, 20);
     Joystick p1(0, 1, 26);
     MatrixStage m(16, 16);
-    // m.setPixelValue(9, 0, 0);
+    m.setPixelValue(0, 0, 0);
 
     unsigned int players[2][4] = { { 6, 7, 8, 9 }, { 6, 7, 8, 9 } };
-    unsigned int ball[4][2] = { {7, 7}, {7, 8}, {8, 7}, {8, 8} };
+    unsigned int ball[4][2] = { {7, 8}, {8, 8}, {8, 7}, {7, 7} };
 
     Matrix matrix(m, 18, 17, 16, 13, 12, 6, 5, 4);
 
