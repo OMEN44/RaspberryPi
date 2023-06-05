@@ -8,10 +8,10 @@
 
 using namespace std;
 
-/*
-g++ Main.cpp ../Hardware/* -o pong -lpigpio -Wall
-clear ; g++ Main.cpp ../Hardware/* -o pong -lpigpio ; sudo ./pong
-*/
+
+//g++ Main.cpp ../Hardware/* -o pong -lpigpio -Wall
+//clear ; g++ Main.cpp ../Hardware/* -o pong -lpigpio ; sudo ./pong
+
 
 #define START_BUTTON 22
 
