@@ -1,94 +1,47 @@
 #include <iostream>
-#include <unistd.h>
-#include <pigpio.h>
-#include "Hardware/MatrixStage.h"
-#include "Hardware/Matrix.h"
-#include "Hardware/MCP3008.h"
-#include "Hardware/Joystick.h"
-#include <vector>
+#include <thread>
+#include <atomic>
+#include <chrono>
 
 using namespace std;
 
-/*
-g++ -Wall -o test test.cpp Hardware/MatrixStage.cpp Hardware/Matrix.cpp Hardware/MCP3008.cpp Hardware/Joystick.cpp -lpigpio
-*/
+class GameEngine
+{
+public:
+    int t = 0;
 
+    void update()
+    {
+        cout << "update" << t << endl;
+        t++;
+        // Your update logic here
+        // This function will be executed in a loop until `running` is set to false
+    }
 
-vector<vector<int>> frame = {
-    {1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,1,1,1,0,0,0,0,1,1,1,1,1,0,0,0,0,1},
-    {1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1,1,1,0,1,1,1,1,0},
-    {1,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0,1,0,1,0,0,1,0,0,0,0,0,1,0,0,1,0},
-    {1,0,1,0,0,1,0,1,1,1,0,1,0,0,1,0,1,0,1,0,0,1,0,1,1,1,0,1,0,0,1,0},
-    {1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1,1,1,0,0,0,0,0,1},
-    {1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,0,1,1},
-    {1,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0,1,0,0,0,0,0,0,0,0,0,1,0,1},
-    {1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1},
-    {1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1},
-    {1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1},
-    {1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1},
-    {1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,0,1,0,1,0,1,0,1,1,1,0},
-    {1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0,1,0,1,1,0,1,1,0},
-    {1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,1,1,1,0,0,1,1,1,0,1,0,1,1,1,0,0,1},
-    {1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0},
-    {1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0}
+    void runUpdateLoop(std::atomic<bool>& running)
+    {
+        while (running)
+        {
+            update();
+            // You can add a delay here using std::this_thread::sleep_for if desired
+        }
+    }
 };
 
 int main()
 {
-    system("clear");
+    std::atomic<bool> running(true); // Atomic variable to control the loop
 
-	cout << "Starting testing" << endl << endl;
+    GameEngine engine; // Create an instance of your game engine class
 
-    if (gpioInitialise() < 0) {
-        cerr << "Failed to initialise GPIO" << endl;
-        return 1;
-    }
+    std::thread t(&GameEngine::runUpdateLoop, &engine, std::ref(running)); // Start the thread, passing the running variable by reference
 
-	vector<vector<int>> vec(24, vector<int>(6, 1));
+    // Wait for user input or any other condition to set `running` to false
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 
-	MatrixStage mstage(16, 16);
-    mstage.setPixelValue(0, 0, 0);
-    int coords[2] = {0, 0};
-    
-    Matrix m(mstage, 18, 17, 16, 13, 12, 6, 5, 4);
+    running = false; // Set the condition to exit the loop
 
-    int inputBuffer = 0;
+    t.join(); // Wait for the thread to finish
 
-    while (true) {
-        if (inputBuffer == 10) {
-            cout << "(" << coords[1] << ", " << coords[0] << ")" << endl;
-            m.getStage().setPixelValue(coords[1], coords[0], 1);
-            if (coords[0] == 15 && coords[1] == 15) {
-                coords[0] = 0;
-                coords[1] = 0;
-            } else if (coords[0] == 15) {
-                coords[0] = 0;
-                coords[1]++;
-            } else {
-                coords[0]++;
-            }
-            m.getStage().setPixelValue(coords[1], coords[0], 0);
-            inputBuffer = 0;
-        } else inputBuffer++;
-        m.update();
-    }
-
-    // for (int y = 0; y < 16; y++) {
-    //     for (int x = 0; x < 16; x++) {
-    //         mstage.setPixelValue(coords[0], coords[1], 1);
-    //         if (coords[0] == 15) {
-    //             coords[0] = 0;
-    //             coords[1]++;
-    //         } else {
-    //             coords[0]++;
-    //         }
-    //         gpioDelay(100000);
-    //         m.update();
-    //     }
-    // }
-    gpioTerminate();
-
-	cout << endl << "Finished testing" << endl;
-
-	return 0;
+    return 0;
 }

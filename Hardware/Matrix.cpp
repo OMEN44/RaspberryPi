@@ -1,5 +1,6 @@
 #include <pigpio.h>
 #include <iostream>
+#include <thread>
 #include "Matrix.h"
 #include "MatrixStage.h"
 
@@ -43,22 +44,29 @@ void Matrix::setSize(int width, int height) {
 }
 
 void Matrix::run(bool* running) {
-    while (*running) {
-        update();
-    }
+    std::cout << "nut" << std::endl;
+    std::thread updateThread([&]() {
+        while (*running) {
+            update();
+        }
+    });
+
+    updateThread.detach();
 }
 
 // private functions
 void Matrix::update() {
+    std::cout << "update" << std::endl;
     update(200);
 }
 
 void Matrix::update(int delay) {
+    std::cout << "G: " << 1 << std::endl;
     if (!this->stageInitialised) {
         std::cerr << "Stage not initialised" << std::endl;
         return;
     }
-    // stage.printCameraView();
+    //stage.printCameraView();
     for (int y = 0; y < height; y++) {
         gpioWrite(G, 1);
         selectRow(y);
@@ -71,8 +79,9 @@ void Matrix::update(int delay) {
         gpioWrite(LAT, 1);
         gpioWrite(LAT, 0);
         gpioWrite(G, 0);
-        gpioDelay(delay);
+        gpioSleep(PI_TIME_RELATIVE, 0, delay);
     }
+    std::cout << "G: " << 0 << std::endl;
 }
 
 void Matrix::selectRow(int row) {
